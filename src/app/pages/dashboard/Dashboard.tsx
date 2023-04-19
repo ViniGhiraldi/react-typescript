@@ -1,12 +1,13 @@
 import { useCallback, useState } from 'react';
 
-interface IListItem{
+interface ITarefa{
+    id: number;
     title: string;
-    isSelected: boolean;
+    isCompleted: boolean;
 }
 
 export const Dashboard = () => {
-    const [lista, setLista] = useState<IListItem[]>([])
+    const [lista, setLista] = useState<ITarefa[]>([])
 
     const handleInputKeyDown: React.KeyboardEventHandler<HTMLInputElement> = useCallback((e)=>{
         if(e.key === 'Enter' && e.currentTarget.value.trim().length > 0){
@@ -16,7 +17,7 @@ export const Dashboard = () => {
             setLista((oldLista)=>{
                 if(oldLista.some((listItem) => listItem.title === value)) return oldLista;
 
-                return [...oldLista, {title: value, isSelected: false}]
+                return [...oldLista, {id: oldLista.length, title: value, isCompleted: false}]
             });
 
             e.currentTarget.value = '';
@@ -31,23 +32,23 @@ export const Dashboard = () => {
               onKeyDown={handleInputKeyDown}
             />
 
-            <p>{lista.filter((listItem) => listItem.isSelected).length}</p>
+            <p>{lista.filter((listItem) => listItem.isCompleted).length}</p>
 
             <ul>
                 {lista.map((listItem, index)=>{
-                    return <li key={index}>
+                    return <li key={listItem.id}>
                         <input
                           type="checkbox"
-                          checked={listItem.isSelected}
+                          checked={listItem.isCompleted}
                           onChange={()=>{
                             setLista(oldLista => {
                                 return oldLista.map(oldListItem => {
-                                    const newIsSelected = oldListItem.title === listItem.title
-                                    ? !oldListItem.isSelected
-                                    : oldListItem.isSelected;
+                                    const newIsCompleted = oldListItem.title === listItem.title
+                                    ? !oldListItem.isCompleted
+                                    : oldListItem.isCompleted;
                                     return {
                                         ...oldListItem,
-                                        isSelected: newIsSelected
+                                        isCompleted: newIsCompleted
                                     };
                                 })
                             })
