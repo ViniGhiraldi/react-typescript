@@ -36,15 +36,12 @@ export const Dashboard = () => {
         }
     },[lista])
 
-    const handleToggleComplete: React.ChangeEventHandler<HTMLInputElement> = useCallback((e)=>{
-        const id = parseInt(e.currentTarget.id);
+    const handleToggleComplete = useCallback((id: number, dataToUpdate: ITarefa)=>{
         TarefasService.updateById(id, {
-            id: id,
-            title: e.currentTarget.name,
-            isCompleted: e.currentTarget.checked
+            ...dataToUpdate,
+            isCompleted: !dataToUpdate.isCompleted
         })
         .then((result)=>{
-            console.log(result)
             if(result instanceof ApiException){
                 alert(result.message)
             }else{
@@ -60,6 +57,21 @@ export const Dashboard = () => {
             }
         })
         .catch(err=>console.log(err))
+    },[])
+
+    const handleDelete = useCallback((id: number)=>{
+        TarefasService.deleteById(id)
+        .then((result)=>{
+            if(result instanceof ApiException){
+                alert(result.message)
+            }else{
+                setLista((oldLista)=>{
+                    return oldLista.filter((oldListItem)=>{
+                        return oldListItem.id !== id;
+                    })
+                })
+            }
+        })
     },[])
 
     return(
@@ -79,12 +91,12 @@ export const Dashboard = () => {
                     return <li key={listItem.id}>
                         <input
                           type="checkbox"
-                          id={listItem.id.toString()}
-                          name={listItem.title}
                           checked={listItem.isCompleted}
-                          onChange={handleToggleComplete}
+                          onChange={() => handleToggleComplete(listItem.id, listItem)}
                         />
                         {index} - {listItem.title}
+
+                        <button onClick={() => handleDelete(listItem.id)}>Apagar</button>
                     </li>
                 })}
             </ul>
